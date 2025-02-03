@@ -18,6 +18,10 @@ class DatabaseSettings(BaseSettings):
     postgres_dsn: PostgresDsn = (
         f"postgresql+asyncpg://{pg_data.USER}:{pg_data.PASSWORD}@{pg_data.HOST}:{pg_data.PORT}/{pg_data.NAME}"
     )
+    
+    @property
+    def dsn(self) -> str:
+        return self.postgres_dsn.unicode_string()
 
 
 class Settings(BaseSettings):

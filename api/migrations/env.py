@@ -9,12 +9,14 @@ from alembic import context
 
 from settings import config as app_cfg
 from database import Model
+from users.models import User
+from posts.models import Post
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
 config_ini_sec = config.config_ini_section
-config.set_section_option(config_ini_sec, name="DB_DSN", value=app_cfg.db.postgres_dsn)
+config.set_section_option(config_ini_sec, name="DB_DSN", value=app_cfg.db.dsn)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
