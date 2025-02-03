@@ -26,7 +26,8 @@ class Repository:
                 async with self.session as session:
                     return await func(self, _session=session, *args, **kwargs)
             except Exception as ex:
-                self.logger.error(ex)
+                print("EXCEPTION IN REPOSITORY", ex)
+                # self.logger.error(ex)
 
         return wrapper
 
@@ -40,13 +41,15 @@ class Repository:
             else Select(self.model).where(self.model.id == id_)
         )
         r = await _session.execute(q)
-        if id_:
+        if id_ is not None:
             pre_result = r.scalar_one_or_none()
             return (
                 self.schema.model_validate(pre_result.__dict__) if pre_result else None
             )
         pre_result = r.scalars().all()
-        return [self.schema.model_validate(m) for m in r.scalars().all()]
+        if pre_result:
+            return [self.schema.model_validate(obj=r.__dict__) for r in pre_result]
+        return []
 
     @__get_session
     async def post(
