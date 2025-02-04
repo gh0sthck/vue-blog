@@ -2,13 +2,16 @@ import datetime
 from pydantic import BaseModel, Field
 
 
-class SPostInsert(BaseModel):
-    id: int
+class SPost(BaseModel):
     title: str = Field(max_length=127)
     text: str
     author: int
 
 
-class SPost(SPostInsert):
+class SPostService(SPost):
+    id: int | None = Field()
+    title: str = Field(max_length=127)
+    text: str 
+    author: int 
     created_date: datetime.datetime | None = None
     update_date: datetime.datetime | None = None
