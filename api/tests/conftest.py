@@ -33,6 +33,8 @@ async def prepare_db():
         await conn.run_sync(Model.metadata.drop_all)
 
 
+
+
 async def create_tables(table: Model, values: Iterable):
     async with test_async_session() as session:
         await session.execute(Delete(table))

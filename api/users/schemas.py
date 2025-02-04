@@ -2,10 +2,16 @@ import datetime
 from pydantic import BaseModel, EmailStr, Field
 
 
-class SUser(BaseModel):
-    id: int
+class SUserView(BaseModel):
     username: str = Field(max_length=90)
-    password: str
-    email: EmailStr
     birthday: datetime.date   
     bio: str
+
+
+class SUser(SUserView):
+    password: str
+    email: EmailStr
+
+
+class SUserService(SUser):
+    id: int
