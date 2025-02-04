@@ -24,6 +24,11 @@ async def posts_add(schema: SPost) -> SPost:
     return await posts_repository.post(schema=schema, commit=True)
 
 
-@posts_router.put("/update/id")
+@posts_router.put("/update/{id}/")
 async def posts_update(id: int, schema: SPost) -> SPost | None:
     return await posts_repository.update(id_=id, schema=schema, commit=True)
+
+
+@posts_router.delete("/delete/{id}/")
+async def posts_delete(id: int) -> SPostService | None:
+    return await posts_repository.delete(id_=id, commit=True)
