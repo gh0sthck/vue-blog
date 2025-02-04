@@ -62,7 +62,7 @@ class Repository:
         self.logger.debug(f"Post executed {q}")
         if commit:
             await _session.commit()
-        return schema
+        return self.schema.model_validate(schema.model_dump())
 
     @__session
     async def update(

@@ -10,7 +10,7 @@ from users.models import User
 from users.schemas import SUser
 from posts.schemas import SPost
 from posts.models import Post
-from database import async_session, Model
+from database import Model
 from settings import config
 
 
@@ -34,7 +34,7 @@ async def prepare_db():
 
 
 async def create_tables(table: Model, values: Iterable):
-    async with async_session() as session:
+    async with test_async_session() as session:
         await session.execute(Delete(table))
         await session.commit()
         stmt = Insert(table).values(values)
@@ -43,7 +43,7 @@ async def create_tables(table: Model, values: Iterable):
 
 
 async def delete_tables(table):
-    async with async_session() as session:
+    async with test_async_session() as session:
         await session.execute(Delete(table))
         await session.commit()
 
