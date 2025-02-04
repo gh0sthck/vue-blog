@@ -16,20 +16,22 @@ async def test_all_users(pre_db_users):
 
 
 @pytest.mark.asyncio
-async def test_specific_user(pre_db_users):
-    user = await repo.get(id_=0)
+@pytest.mark.parametrize("id_", [i for i in range(10)])
+async def test_specific_user(id_, pre_db_users):
+    user = await repo.get(id_=id_)
     assert isinstance(user, SUser)
     assert user in await repo.get()
-    assert user.id == 0
+    assert user.id == id_
 
 
 @pytest.mark.asyncio
-async def test_insert_user(pre_db_users):
+@pytest.mark.parametrize("id_", [i for i in range(20, 30)])
+async def test_insert_user(id_, pre_db_users):
     new_user = SUser(
-        id=2,
-        username="testuser2",
+        id=id_,
+        username=f"user_test-insert{id_}",
         password="testpass",
-        email="testmaill@gmail.com",
+        email=f"testmaill{id_}@gmail.com",
         birthday=datetime.date.today(),
         bio="non",
     )
@@ -40,12 +42,13 @@ async def test_insert_user(pre_db_users):
 
 
 @pytest.mark.asyncio
-async def test_update_user(pre_db_users):
+@pytest.mark.parametrize("id_", [i for i in range(10)])
+async def test_update_user(id_, pre_db_users):
     new_user = SUser(
-        id=0,
-        username="testuser2",
+        id=id_,
+        username=f"user_test-update{id_}",
         password="testpass",
-        email="testmaill@gmail.com",
+        email=f"testmaill{id_}@gmail.com",
         birthday=datetime.date.today(),
         bio="non",
     )
@@ -56,7 +59,8 @@ async def test_update_user(pre_db_users):
 
 
 @pytest.mark.asyncio
-async def test_delete_user(pre_db_users):
-    r = await repo.delete(id_=0, commit=True)
+@pytest.mark.parametrize("id_", [i for i in range(10)])
+async def test_delete_user(id_, pre_db_users):
+    r = await repo.delete(id_=id_, commit=True)
     assert r not in await repo.get()
     assert None == await repo.get(id_=r.id)

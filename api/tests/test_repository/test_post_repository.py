@@ -16,39 +16,42 @@ async def test_all_posts(pre_db_posts):
 
 
 @pytest.mark.asyncio
-async def test_specific_post(pre_db_posts):
-    specific_post = await repo.get(id_=0)
+@pytest.mark.parametrize("id_", [i for i in range(10)])
+async def test_specific_post(id_, pre_db_posts):
+    specific_post = await repo.get(id_=id_)
     assert isinstance(specific_post, SPost)
 
 
 @pytest.mark.asyncio
-async def test_insert_post(pre_db_posts):
+@pytest.mark.parametrize("id_", [i for i in range(20, 30)])
+async def test_insert_post(id_, pre_db_posts):
     result = await repo.post(
         schema=SPost(
-            id=20,
-            title="testpost",
+            id=id_,
+            title=f"post_test-insert{id_}",
             text="test",
             created_date=datetime.datetime.now(datetime.timezone.utc),
             update_date=datetime.datetime.now(datetime.timezone.utc),
-            author=0,
+            author=id_-20,
         ),
         commit=True,
     )
 
     assert isinstance(result, SPost)
     assert result in await repo.get()
-    assert result == await repo.get(id_=20)
+    assert result == await repo.get(id_=id_)
 
 
 @pytest.mark.asyncio
-async def test_update_post(pre_db_posts):
+@pytest.mark.parametrize("id_", [i for i in range(10)])
+async def test_update_post(id_, pre_db_posts):
     new_post = SPost(
-        id=2,
-        title="testpost",
+        id=id_,
+        title=f"post_test-insert{id_}",
         text="test",
         created_date=datetime.datetime.now(datetime.timezone.utc),
         update_date=datetime.datetime.now(datetime.timezone.utc),
-        author=0,
+        author=id_,
     )
 
     r = await repo.update(id_=new_post.id, schema=new_post, commit=True)
@@ -60,8 +63,9 @@ async def test_update_post(pre_db_posts):
 
 
 @pytest.mark.asyncio
-async def test_delete_post(pre_db_posts):
-    r = await repo.delete(id_=1, commit=True)
+@pytest.mark.parametrize("id_", [i for i in range(10)])
+async def test_delete_post(id_, pre_db_posts):
+    r = await repo.delete(id_=id_, commit=True)
 
     assert isinstance(r, SPost)
     assert r not in await repo.get()
