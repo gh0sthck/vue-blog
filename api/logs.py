@@ -2,7 +2,7 @@ import logging
 
 
 class BlogLogger:
-    _FMT = "[{level}] {asctime} {filename}, {lineo} | {message}"
+    _FMT = "[{levelname}] {asctime} {filename}, {lineno} | {message}"
     _LOGGER_FORMATTER = logging.Formatter(fmt=_FMT, style="{", datefmt="%H:%M:%S")
 
     def __init__(self, name: str = "blog"):
