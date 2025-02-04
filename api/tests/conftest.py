@@ -7,12 +7,11 @@ from sqlalchemy import Insert, Delete
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 
 from users.models import User
-from users.schemas import SUser
 from posts.schemas import SPost
 from posts.models import Post
 from database import Model
 from settings import config
-
+from .fixtures import get_user_list, get_posts_list
 
 test_engine = create_async_engine(url=config.db_tests.dsn)
 test_async_session = async_sessionmaker(bind=test_engine, expire_on_commit=False)
@@ -33,53 +32,36 @@ async def prepare_db():
         await conn.run_sync(Model.metadata.drop_all)
 
 
+async def delete_tables(table: Model):
+    async with test_async_session() as session:
+        await session.execute(Delete(table))
+        await session.commit()
+
 
 
 async def create_tables(table: Model, values: Iterable):
+    # async with test_async_session() as session:
+    #     await session.execute(Delete(table))
+    #     await session.commit()
+    await delete_tables(table)
     async with test_async_session() as session:
-        await session.execute(Delete(table))
-        await session.commit()
-        stmt = Insert(table).values(values)
-        await session.execute(stmt)
+        # stmt = Insert(table).values(values)
+        await session.execute(Insert(table).values(values))
         await session.commit()
 
-
-async def delete_tables(table):
-    async with test_async_session() as session:
-        await session.execute(Delete(table))
-        await session.commit()
 
 
 @pytest_asyncio.fixture
-async def pre_db_users():
+async def pre_db_users(get_user_list):
     await create_tables(
-        User,
-        SUser(
-            id=0,
-            username="testuser",
-            password="test",
-            email="test@mail.com",
-            birthday=datetime.date.today(),
-            bio="test",
-        ).model_dump(),
+        User, get_user_list
     )
     yield
     await delete_tables(User)
 
 
 @pytest_asyncio.fixture
-async def pre_db_posts(pre_db_users):
-    posts = [
-        SPost(
-            id=i,
-            title=f"test-post-{i}",
-            text=f"post-desc-{i}",
-            created_date=datetime.datetime.now(datetime.timezone.utc),
-            update_date=datetime.datetime.now(datetime.timezone.utc),
-            author=0,
-        ).model_dump()
-        for i in range(10)
-    ]
-    await create_tables(Post, posts)
+async def pre_db_posts(pre_db_users, get_posts_list):
+    await create_tables(Post, get_posts_list)
     yield
     await delete_tables(Post)

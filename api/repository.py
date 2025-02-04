@@ -56,7 +56,7 @@ class Repository:
     @__session
     async def post(
         self, schema: BaseModel, commit: bool = False, _session: AsyncSession = ...
-    ) -> BaseModel:
+    ) -> BaseModel: 
         q = Insert(self.model).values(schema.model_dump())
         await _session.execute(q)
         self.logger.debug(f"Post executed {q}")

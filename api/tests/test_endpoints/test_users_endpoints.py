@@ -29,26 +29,30 @@ async def test_users_endp_get(pre_db_users, get_client):
 
 
 @pytest.mark.asyncio
-async def test_users_endp_specific(pre_db_users, get_client):
-    client: httpx.AsyncClient = get_client
-    resp_specific = await client.get("/2/")
-    assert resp_specific.status_code == 200
-    assert resp_specific.json() is not None
-    assert isinstance(SUserView.model_validate(resp_specific.json()), SUserView)
-
-
-@pytest.mark.asyncio
 async def test_users_endp_reg(pre_db_users, get_client):
-    client: httpx.AsyncClient = get_client 
+    client: httpx.AsyncClient = get_client
     us = SUser(
+        id=123, 
         username="newuser",
         birthday=datetime.date.today(),
         password="testpass",
-        email="testmail@mail.com",
-        bio="test"  
+        email="testmaillll@mail.com",
+        bio="test",
     )
-    us.birthday = us.birthday.isoformat() 
+    us.birthday = us.birthday.isoformat()
     resp = await client.post(url="/register/", json=us.model_dump())
     assert resp.status_code == 200
     assert resp.json() is not None
-    assert isinstance(SUserView.model_validate(resp.json()), SUserView) 
+    assert isinstance(SUserView.model_validate(resp.json()), SUserView)
+    assert us.username in tuple(
+        u["username"] for u in (await client.get("/all/")).json()
+    )
+
+
+@pytest.mark.asyncio
+async def test_users_endp_specific(pre_db_users, get_client):
+    client: httpx.AsyncClient = get_client
+    resp_specific = await client.get("/0/")
+    assert resp_specific.status_code == 200
+    assert resp_specific.json() is not None
+    assert isinstance(SUserView.model_validate(resp_specific.json()), SUserView)

@@ -30,5 +30,5 @@ async def posts_update(id: int, schema: SPost) -> SPost | None:
 
 
 @posts_router.delete("/delete/{id}/")
-async def posts_delete(id: int) -> SPostService | None:
+async def posts_delete(id: int) -> SPost | None:
     return await posts_repository.delete(id_=id, commit=True)

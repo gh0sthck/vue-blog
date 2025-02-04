@@ -24,5 +24,5 @@ async def users_by_id(id: int) -> None | SUserView:
 
 @users_router.post("/register/")
 async def users_register(schema: SUser) -> SUserView:
-    raw: SUser = await users_repo.post(schema)
+    raw: SUser = await users_repo.post(schema, commit=True)
     return SUserView.model_validate(raw.model_dump())
