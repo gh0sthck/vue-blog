@@ -12,10 +12,10 @@ class Post(Model):
     title: Mapped[str] = mapped_column(String(length=127), unique=True, nullable=False)
     text: Mapped[str] = mapped_column(Text(), nullable=True)
     created_date: Mapped[datetime.datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now()
+        DateTime(), server_default=func.now()
     )
     update_date: Mapped[datetime.datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
+        DateTime(), server_default=func.now(), onupdate=func.now()
     )
     author: Mapped["User"] = mapped_column(ForeignKey("user.id", ondelete="cascade"))
 

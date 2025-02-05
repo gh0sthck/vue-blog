@@ -13,6 +13,7 @@ async def users_all() -> None | list[SUserView]:
     r: list[SUser] | None = await users_repo.get()
     if r:
         return [SUserView.model_validate(m.model_dump()) for m in r]
+    return []
 
 
 @users_router.get("/{id}/")

@@ -1,17 +1,12 @@
+<script setup lang="ts">
+import Header from './components/Header.vue'
+import Main from './components/Main.vue'
+
+</script>
+
+
 <template>
-    <header class="header">
-        <div class="container">
+  <Header />
+  <Main />
 
-        </div>
-    </header>
-
-    <main class="main">
-        <div class="container">
-
-        </div>
-    </main>
-
-    <footer class="footer">
-        <div class="container"></div>
-    </footer>
-</template> 
+</template>

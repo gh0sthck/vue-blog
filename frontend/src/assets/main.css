@@ -1,5 +1,37 @@
 * {
-    padding: 0;
-    margin: 0;
-    font-size: 16px;
+  padding: 0;
+  margin: 0;
+  font-size: 16px;
+  list-style-type: none;
+  list-style: none;
+  color: #000;
+  outline: none;
+  border: none;
+  text-decoration: none;
+}
+
+a {
+  text-decoration: none;
+  color: #000;
+}
+
+.header {
+  background-color: #affdbc;
+  margin-bottom: 50px;
+}
+
+.navigation__list {
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 15px 0;
+}
+
+.post {
+  display: block;
+  background-color: rgba(243, 243, 243, 0.4);
+  padding: 30px;
+  border-radius: 20px;
+  margin-bottom: 30px;
 }
