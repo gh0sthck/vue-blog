@@ -8,6 +8,7 @@ from repository import Repository
 
 
 class SortTypes(enum.Enum):
+    ALL: str = "all"
     NEWEST: str = "newest"
     OLDEST: str = "oldest"
     TODAY: str = "today"
@@ -27,8 +28,10 @@ class PostRepository(Repository):
             if id_ is None
             else Select(self.model).where(self.model.id == id_)
         )
-        self.logger.debug(sort_type)
+        self.logger.debug(f"SortType: {sort_type}")
         match sort_type:
+            case SortTypes.ALL:
+                q= q
             case SortTypes.TITLE:
                 q = q.order_by(self.model.title)
             case SortTypes.TODAY:
