@@ -18,7 +18,7 @@ class Repository:
         self.commit = False
         self.logger = self.LOGGER.get_logger()
 
-    def __session(func: Callable):
+    def _session(func: Callable):
         wraps(func)
 
         async def wrapper(self, *args, **kwargs):
@@ -31,7 +31,7 @@ class Repository:
 
         return wrapper
 
-    @__session
+    @_session
     async def get(
         self, id_: int | None = None, _session: AsyncSession = ...
     ) -> list[BaseModel] | BaseModel | None:
@@ -53,7 +53,7 @@ class Repository:
             return [self.schema.model_validate(obj=r.__dict__) for r in pre_result]
         return []
 
-    @__session
+    @_session
     async def post(
         self, schema: BaseModel, commit: bool = False, _session: AsyncSession = ...
     ) -> BaseModel: 
@@ -64,7 +64,7 @@ class Repository:
             await _session.commit()
         return schema
 
-    @__session
+    @_session
     async def update(
         self,
         id_: int,
@@ -86,7 +86,7 @@ class Repository:
             return schema
         return None
 
-    @__session
+    @_session
     async def delete(
         self, id_: int, commit: bool = False, _session: AsyncSession = ...
     ) -> BaseModel | None:
