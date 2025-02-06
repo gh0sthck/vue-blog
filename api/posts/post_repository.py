@@ -1,6 +1,6 @@
 import datetime
 import enum
-from sqlalchemy import Date, Select, cast, func
+from sqlalchemy import Date, Insert, Select, cast, func
 
 from .models import Post
 from .schemas import SPost, SPostService
@@ -31,7 +31,7 @@ class PostRepository(Repository):
         self.logger.debug(f"SortType: {sort_type}")
         match sort_type:
             case SortTypes.ALL:
-                q= q
+                q = q
             case SortTypes.TITLE:
                 q = q.order_by(self.model.title)
             case SortTypes.TODAY:
@@ -53,3 +53,18 @@ class PostRepository(Repository):
             self.logger.debug(f"Get Pre result = {pre_result}")
             return [self.schema.model_validate(obj=r.__dict__) for r in pre_result]
         return []
+
+    @Repository._session
+    async def post(
+        self, schema: SPost, commit: bool = False, _session = ...
+    ) -> SPostService:
+        q = Insert(self.model).values(schema.model_dump())
+        id_ = await _session.execute(q)
+        self.logger.debug(f"Post executed {q}")
+        if commit:
+            await _session.commit()
+        model_dict = q.compile().params
+        model_dict["created_date"] = datetime.datetime.now()
+        model_dict["id"] = id_.inserted_primary_key[0]
+        model_dict["update_date"] = datetime.datetime.now()
+        return self.schema.model_validate(model_dict)

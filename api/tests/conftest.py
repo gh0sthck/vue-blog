@@ -1,5 +1,4 @@
 import asyncio
-import datetime
 from typing import Iterable
 import pytest
 import pytest_asyncio
@@ -7,7 +6,6 @@ from sqlalchemy import Insert, Delete
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 
 from users.models import User
-from posts.schemas import SPost
 from posts.models import Post
 from database import Model
 from settings import config
@@ -38,24 +36,16 @@ async def delete_tables(table: Model):
         await session.commit()
 
 
-
 async def create_tables(table: Model, values: Iterable):
-    # async with test_async_session() as session:
-    #     await session.execute(Delete(table))
-    #     await session.commit()
     await delete_tables(table)
     async with test_async_session() as session:
-        # stmt = Insert(table).values(values)
         await session.execute(Insert(table).values(values))
         await session.commit()
 
 
-
 @pytest_asyncio.fixture
 async def pre_db_users(get_user_list):
-    await create_tables(
-        User, get_user_list
-    )
+    await create_tables(User, get_user_list)
     yield
     await delete_tables(User)
 

@@ -1,7 +1,8 @@
 import datetime
 from typing import List
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import DateTime, ForeignKey, String, Text, func
+from sqlalchemy import DateTime, ForeignKey, Integer, String, Table, Text, func
+from comments.models import Comment, Review
 from users.models import User
 from database import Model
 
@@ -20,3 +21,4 @@ class Post(Model):
     author: Mapped["User"] = mapped_column(ForeignKey("user.id", ondelete="cascade"))
 
     users: Mapped[List["User"]] = relationship(back_populates="posts")
+    reviews: Mapped[list["Review"]] = relationship(backref="posts", secondary=Comment)

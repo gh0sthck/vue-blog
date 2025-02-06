@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from settings import config
 from posts import posts_router
 from users import users_router
+from comments import comments_router
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -25,3 +26,4 @@ app.add_middleware(
 
 app.include_router(posts_router)
 app.include_router(users_router)
+app.include_router(comments_router)

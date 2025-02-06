@@ -11,6 +11,7 @@ from settings import config as app_cfg
 from database import Model
 from users.models import User
 from posts.models import Post
+from comments.models import Comment, Review
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

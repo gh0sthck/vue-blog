@@ -1,5 +1,4 @@
 import datetime
-from re import S
 import pytest_asyncio
 import httpx
 import pytest
@@ -18,6 +17,9 @@ async def get_client():
         yield cli
 
 
+RETURN_SCHEMA = SUserView
+
+
 @pytest.mark.asyncio
 async def test_users_endp_all(pre_db_users, get_client):
     client: httpx.AsyncClient = get_client
@@ -29,11 +31,10 @@ async def test_users_endp_all(pre_db_users, get_client):
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("id_", [i for i in range(20, 30)])
+@pytest.mark.parametrize("id_", [i for i in range(1, 10)])
 async def test_users_endp_reg(id_, pre_db_users, get_client):
     client: httpx.AsyncClient = get_client
     us = SUser(
-        id=id_, 
         username=f"test_user-reg{id_}",
         birthday=datetime.date.today(),
         password="testpass",
@@ -44,19 +45,18 @@ async def test_users_endp_reg(id_, pre_db_users, get_client):
     resp = await client.post(url="/register/", json=us.model_dump())
     assert resp.status_code == 200
     assert resp.json() is not None
-    assert isinstance(SUserView.model_validate(resp.json()), SUserView)
-    assert resp.json()["id"] == id_ 
+    assert isinstance(RETURN_SCHEMA.model_validate(resp.json()), RETURN_SCHEMA)
+    assert resp.json()["id"] == id_
     assert us.username in tuple(
         u["username"] for u in (await client.get("/all/")).json()
     )
 
-
 @pytest.mark.asyncio
-@pytest.mark.parametrize("id_", [i for i in range(10)])
+@pytest.mark.parametrize("id_", [i for i in range(10, 20)])
 async def test_users_endp_specific(id_, pre_db_users, get_client):
     client: httpx.AsyncClient = get_client
     resp_specific = await client.get(f"/{id_}/")
     assert resp_specific.status_code == 200
     assert resp_specific.json() is not None
     assert resp_specific.json()["id"] == id_
-    assert isinstance(SUserView.model_validate(resp_specific.json()), SUserView)
+    assert isinstance(RETURN_SCHEMA.model_validate(resp_specific.json()), RETURN_SCHEMA)

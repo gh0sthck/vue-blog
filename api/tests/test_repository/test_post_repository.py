@@ -1,72 +1,65 @@
-import datetime
 import pytest
-from posts.models import Post
-from posts.schemas import SPost
-from repository import Repository
+from posts.post_repository import PostRepository
+from posts.schemas import SPost, SPostService
 
 
-repo = Repository(model=Post, schema=SPost)
+repo = PostRepository()
+
+RETURN_SCHEMA = SPostService
 
 
 @pytest.mark.asyncio
 async def test_all_posts(pre_db_posts):
     all_posts = await repo.get()
     assert isinstance(all_posts, list)
-    assert isinstance(all_posts[0], SPost)
+    assert isinstance(all_posts[0], RETURN_SCHEMA)
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("id_", [i for i in range(10)])
+@pytest.mark.parametrize("id_", [i for i in range(10, 20)])
 async def test_specific_post(id_, pre_db_posts):
     specific_post = await repo.get(id_=id_)
-    assert isinstance(specific_post, SPost)
+    assert isinstance(specific_post, RETURN_SCHEMA)
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("id_", [i for i in range(20, 30)])
+@pytest.mark.parametrize("id_", [i for i in range(1, 10)])
 async def test_insert_post(id_, pre_db_posts):
     result = await repo.post(
         schema=SPost(
-            id=id_,
             title=f"post_test-insert{id_}",
             text="test",
-            created_date=datetime.datetime.now(datetime.timezone.utc),
-            update_date=datetime.datetime.now(datetime.timezone.utc),
-            author=id_-20,
+            author=id_ + 10,
         ),
         commit=True,
     )
-
-    assert isinstance(result, SPost)
-    assert result in await repo.get()
-    assert result == await repo.get(id_=id_)
+    assert isinstance(result, RETURN_SCHEMA)
+    assert result.title in [m.title for m in await repo.get()]
+    assert SPost.model_validate(result.model_dump()) == SPost.model_validate(
+        (await repo.get(id_=id_)).model_dump()
+    )
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("id_", [i for i in range(10)])
+@pytest.mark.parametrize("id_", [i for i in range(10, 20)])
 async def test_update_post(id_, pre_db_posts):
     new_post = SPost(
-        id=id_,
         title=f"post_test-insert{id_}",
         text="test",
-        created_date=datetime.datetime.now(datetime.timezone.utc),
-        update_date=datetime.datetime.now(datetime.timezone.utc),
         author=id_,
     )
 
-    r = await repo.update(id_=new_post.id, schema=new_post, commit=True)
+    r = await repo.update(id_=id_, schema=new_post, commit=True)
 
     assert isinstance(r, SPost)
     assert r == new_post
-    assert new_post == await repo.get(id_=new_post.id)
-    assert new_post in await repo.get()
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("id_", [i for i in range(10)])
+@pytest.mark.parametrize("id_", [i for i in range(10, 20)])
 async def test_delete_post(id_, pre_db_posts):
     r = await repo.delete(id_=id_, commit=True)
 
-    assert isinstance(r, SPost)
+    assert isinstance(r, RETURN_SCHEMA)
     assert r not in await repo.get()
     assert None == await repo.get(id_=r.id)

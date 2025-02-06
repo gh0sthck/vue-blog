@@ -43,6 +43,22 @@ async function get_posts(sort: string | null) {
   }
 }
 
+//async function get_posts(sort: string | null) {
+//  try {
+//    if (sort == null) {
+//      const { data } = await axios.get("http://localhost:8000/posts/all")
+//    } else {
+//      const { data } = await axios.get("http://localhost:8000/posts/all?sort_by=" + sort)
+//    }
+//    console.log(data)
+//    return data
+//  } catch (exc) {
+//
+//    console.error(exc);
+//    return null;
+//  }
+//}
+
 async function set_authors(posts_list: IPost[]) {
   for (let i = 0; i < posts_list.length; i++) {
     const auth_id = posts_list[i].author;

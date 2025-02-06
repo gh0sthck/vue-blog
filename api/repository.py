@@ -1,3 +1,4 @@
+import datetime
 from functools import wraps
 from typing import Callable
 from pydantic import BaseModel
@@ -49,20 +50,22 @@ class Repository:
             )
         pre_result = r.scalars().all()
         if pre_result:
-            self.logger.debug(f"Get Pre result = {pre_result}") 
+            self.logger.debug(f"Get Pre result = {pre_result}")
             return [self.schema.model_validate(obj=r.__dict__) for r in pre_result]
         return []
 
     @_session
     async def post(
         self, schema: BaseModel, commit: bool = False, _session: AsyncSession = ...
-    ) -> BaseModel: 
+    ) -> BaseModel:
         q = Insert(self.model).values(schema.model_dump())
-        await _session.execute(q)
+        db_id = await _session.execute(q)
         self.logger.debug(f"Post executed {q}")
+        model_dict = q.compile().params
+        model_dict["id"] = db_id.inserted_primary_key[0] 
         if commit:
             await _session.commit()
-        return schema
+        return self.schema.model_validate(model_dict)
 
     @_session
     async def update(
@@ -80,7 +83,7 @@ class Repository:
                 .values(schema.model_dump())
             )
             await _session.execute(q)
-            self.logger.debug(f"Update executed {q}") 
+            self.logger.debug(f"Update executed {q}")
             if commit:
                 await _session.commit()
             return schema
@@ -94,7 +97,7 @@ class Repository:
         if p:
             q = Delete(self.model).where(self.model.id == id_)
             await _session.execute(q)
-            self.logger.debug(f"Delete executed {q}") 
+            self.logger.debug(f"Delete executed {q}")
             if commit:
                 await _session.commit()
             return self.schema.model_validate(p)
