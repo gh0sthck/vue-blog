@@ -1,8 +1,9 @@
 import datetime
 import pytest
 
-from posts.schemas import SPostService, SPostTest
-from users.schemas import SUser, SUserTest
+from comments.schemas import SReviewView, SCommentView
+from posts.schemas import SPostTest
+from users.schemas import SUserTest
 
 GENERATING_RANGE = range(10, 20)
 
@@ -35,3 +36,27 @@ def get_posts_list() -> list[dict]:
         ).model_dump()
         for cnt in GENERATING_RANGE
     ]
+
+
+@pytest.fixture()
+def get_review_list() -> list[dict]:
+    return [
+        SReviewView(
+           id=cnt,
+           text=f"text-for-review-{cnt}",
+           author=cnt,
+           create_date=datetime.datetime.now() 
+        ).model_dump()
+        for cnt in GENERATING_RANGE
+    ]
+
+@pytest.fixture
+def get_comments_list() -> list[dict]:
+    return [
+        SCommentView(
+            id=cnt,
+            post_id=cnt,
+            review_id=cnt,
+        ).model_dump()
+        for cnt in GENERATING_RANGE
+    ] 

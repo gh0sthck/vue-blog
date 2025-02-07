@@ -51,6 +51,7 @@ async def test_users_endp_reg(id_, pre_db_users, get_client):
         u["username"] for u in (await client.get("/all/")).json()
     )
 
+
 @pytest.mark.asyncio
 @pytest.mark.parametrize("id_", [i for i in range(10, 20)])
 async def test_users_endp_specific(id_, pre_db_users, get_client):

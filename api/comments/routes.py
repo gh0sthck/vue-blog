@@ -3,7 +3,6 @@ from fastapi.routing import APIRouter
 from .comments_repository import CommentsRepository
 
 from .models import Comment, Review
-from repository import Repository
 from .schemas import SCommentView, SReview, SComment, SReviewView
 
 comments_router = APIRouter(prefix="/comments", tags=["Comments"])
