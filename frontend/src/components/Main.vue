@@ -43,22 +43,6 @@ async function get_posts(sort: string | null) {
   }
 }
 
-//async function get_posts(sort: string | null) {
-//  try {
-//    if (sort == null) {
-//      const { data } = await axios.get("http://localhost:8000/posts/all")
-//    } else {
-//      const { data } = await axios.get("http://localhost:8000/posts/all?sort_by=" + sort)
-//    }
-//    console.log(data)
-//    return data
-//  } catch (exc) {
-//
-//    console.error(exc);
-//    return null;
-//  }
-//}
-
 async function set_authors(posts_list: IPost[]) {
   for (let i = 0; i < posts_list.length; i++) {
     const auth_id = posts_list[i].author;
@@ -86,16 +70,16 @@ watch(sort_by, async () => {
 <template>
   <main class="main">
     <div class="container">
-      <select @change="on_sort_change" name="sort" id="sort">
-        <option value="all">Все</option>
-        <option value="newest">Новые</option>
-        <option value="oldest">Старые</option>
-        <option value="today">За сегодня</option>
-        <option value="title">По название</option>
-      </select>
       <div class="posts">
+        <select @change="on_sort_change" name="sort" id="sort">
+          <option value="all">Все</option>
+          <option value="newest">Новые</option>
+          <option value="oldest">Старые</option>
+          <option value="today">За сегодня</option>
+          <option value="title">По название</option>
+        </select>
         <Post v-for="post in posts.list" v-key="post.id" :title="post.title" :author="post.author"
-          :created_date="post.created_date" />
+          :created_date="post.created_date" :text="post.text" />
       </div>
     </div>
   </main>
