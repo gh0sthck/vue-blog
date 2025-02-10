@@ -7,10 +7,16 @@ from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 
 from comments.models import Comment, Review
 from users.models import User
-from posts.models import Post
+from posts.models import Like, Post
 from database import Model
 from settings import config
-from .fixtures import get_user_list, get_posts_list, get_review_list, get_comments_list
+from .fixtures import (
+    get_likes_list,
+    get_user_list,
+    get_posts_list,
+    get_review_list,
+    get_comments_list,
+)
 
 test_engine = create_async_engine(url=config.db_tests.dsn)
 test_async_session = async_sessionmaker(bind=test_engine, expire_on_commit=False)
@@ -70,3 +76,10 @@ async def pre_db_comments(pre_db_reviews, get_comments_list):
     await create_tables(Comment, get_comments_list)
     yield
     await delete_tables(Comment)
+
+
+@pytest_asyncio.fixture
+async def pre_db_likes(pre_db_posts, get_likes_list):
+    await create_tables(Like, get_likes_list)
+    yield
+    await delete_tables(Like)

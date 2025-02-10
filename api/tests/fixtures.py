@@ -2,7 +2,7 @@ import datetime
 import pytest
 
 from comments.schemas import SReviewView, SCommentView
-from posts.schemas import SPostTest
+from posts.schemas import SLikeService, SPostTest
 from users.schemas import SUserTest
 
 GENERATING_RANGE = range(10, 20)
@@ -42,13 +42,14 @@ def get_posts_list() -> list[dict]:
 def get_review_list() -> list[dict]:
     return [
         SReviewView(
-           id=cnt,
-           text=f"text-for-review-{cnt}",
-           author=cnt,
-           create_date=datetime.datetime.now() 
+            id=cnt,
+            text=f"text-for-review-{cnt}",
+            author=cnt,
+            create_date=datetime.datetime.now(),
         ).model_dump()
         for cnt in GENERATING_RANGE
     ]
+
 
 @pytest.fixture
 def get_comments_list() -> list[dict]:
@@ -59,4 +60,12 @@ def get_comments_list() -> list[dict]:
             review_id=cnt,
         ).model_dump()
         for cnt in GENERATING_RANGE
-    ] 
+    ]
+
+
+@pytest.fixture
+def get_likes_list() -> list[dict]:
+    return [
+        SLikeService(id=cnt, user_id=cnt, post_id=cnt).model_dump()
+        for cnt in GENERATING_RANGE
+    ]

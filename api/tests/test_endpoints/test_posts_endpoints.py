@@ -2,7 +2,7 @@ import pytest
 import httpx
 import pytest_asyncio
 
-from posts.schemas import SPost, SPostService
+from posts.schemas import SLike, SLikeService, SPost, SPostService
 from main import app
 
 URL = "http://localhost:8000/posts"
@@ -84,15 +84,24 @@ async def test_posts_endp_delete(id_, pre_db_posts, get_client):
     assert resp.json() not in all_posts.json()
 
 
-# @pytest.mark.asyncio
-# async def test_posts_endp_like(id_, pre_db_posts, get_client):
-#     client: httpx.AsyncClient = get_client
-#     resp = await client.post(url=f"/like/{id_}")
-#     assert resp.status_code == 200
+@pytest.mark.asyncio
+@pytest.mark.parametrize("id_", [i for i in range(1, 10)])
+async def test_posts_endp_like(id_, pre_db_posts, get_client):
+    client: httpx.AsyncClient = get_client
+    payload = SLike(
+        user_id=id_+10,
+        post_id=id_+10
+    ).model_dump()
+    resp = await client.post(url=f"/like", json=payload)
+    assert resp.status_code == 200
+    assert isinstance(SLikeService.model_validate(resp.json()), SLikeService)
 
 
-# @pytest.mark.asyncio
-# async def test_posts_endp_comment(id_, text, pre_db_posts, get_client):
-#     client: httpx.AsyncClient = get_client
-#     resp = await client.post(url="comment/{id_}",)
-#     assert resp.status_code == 200
+@pytest.mark.asyncio
+@pytest.mark.parametrize("post_id", [i for i in range(10, 20)])
+async def test_posts_endp_like_get(post_id, pre_db_likes, get_client):
+    client: httpx.AsyncClient = get_client
+    resp = await client.get(f"/likes/{post_id}")
+    assert resp.status_code == 200
+    assert isinstance(resp.json(), list)
+    assert post_id in resp.json()  # In that case, post_id = user_id (fixtures.py) 

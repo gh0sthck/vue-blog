@@ -35,8 +35,8 @@ async def posts_delete(id: int) -> SPostService | None:
     return await posts_repository.delete(id_=id, commit=True)
 
 
-@posts_router.post("/like/{post_id}")
-async def posts_like(post_id: int, schema: SLike) -> SLikeService | None:
+@posts_router.post("/like")
+async def posts_like(schema: SLike) -> SLikeService | None:
     return await likes_repository.post(schema=schema, commit=True)
 
 
