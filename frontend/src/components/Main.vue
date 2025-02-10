@@ -9,7 +9,9 @@ interface IPost {
   title: string,
   author: string,
   text: string,
-  created_date: string
+  created_date: string,
+  likes: number[],
+  is_liked: boolean,
 };
 
 let posts = reactive<{ list: IPost[] }>({
@@ -51,12 +53,31 @@ async function set_authors(posts_list: IPost[]) {
     const date = new Date(posts.list[i].created_date)
     posts_list[i].created_date = String(date.getFullYear() + "-" + date.getMonth() + "-" + date.getDate());
   }
-  return posts
+  return posts_list
+}
+
+const TEST_UID = 31;
+
+async function set_likes(posts_list: IPost[]) {
+  for (let i = 0; i < posts_list.length; i++) {
+    const pid = posts_list[i].id;
+    const { data } = await axios.get("http://localhost:8000/posts/likes/" + String(pid));
+    posts_list[i].likes = data;
+    console.log(data) 
+    if (data.includes(TEST_UID)) {
+      posts_list[i].is_liked = true;
+      console.log("tt", posts_list[i].is_liked)
+    } else {
+      posts_list[i].is_liked = false;
+    }
+  }
+  return posts_list;
 }
 
 onMounted(async () => {
   posts.list = await get_posts(null);
-  await set_authors(posts.list);
+  posts.list = await set_authors(posts.list);
+  posts.list = await set_likes(posts.list);
 })
 
 
@@ -78,8 +99,17 @@ watch(sort_by, async () => {
           <option value="today">За сегодня</option>
           <option value="title">По название</option>
         </select>
-        <Post v-for="post in posts.list" v-key="post.id" :title="post.title" :author="post.author"
-          :created_date="post.created_date" :text="post.text" />
+        <Post
+          v-for="post in posts.list"
+          v-key="post.id"
+          :id="post.id"
+          :title="post.title" 
+          :author="post.author"
+          :created_date="post.created_date"
+          :text="post.text"
+          :likes="post.likes" 
+          :is_liked="post.is_liked"
+        />
       </div>
     </div>
   </main>

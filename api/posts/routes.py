@@ -40,6 +40,12 @@ async def posts_like(schema: SLike) -> SLikeService | None:
     return await likes_repository.post(schema=schema, commit=True)
 
 
+@posts_router.post("/dislike")
+async def posts_dislike(schema: SLike) -> SLikeService | None:
+    return await likes_repository.delete(schema=schema, commit=True)
+
+
 @posts_router.get("/likes/{post_id}")
-async def posts_like_get(post_id: int) -> list[int] | None:
+async def posts_like_get(post_id: int) -> list | None:
     return await likes_repository.get(id_=post_id)
+

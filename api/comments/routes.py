@@ -19,10 +19,15 @@ async def comments_insert(id: int, review: SReview) -> SCommentView:
 
 
 @comments_router.get("/reviews/{id}")
-async def reviews_by_id(id: int) -> SReviewView:
+async def reviews_by_id(id: int) -> SReviewView | None:
     return await review_repo.get(id_=id)
 
 
 @comments_router.get("/get/{post_id}")
 async def comments_by_post(post_id: int) -> list[SCommentView]:
     return await comments_repo.get_comments(post_id=post_id)
+
+
+@comments_router.get("/reviews_all/{id}")
+async def reviews_all(id: int) -> list[SReviewView] | None:
+    return [await reviews_by_id(m.review_id) for m in await comments_by_post(post_id=id)]
