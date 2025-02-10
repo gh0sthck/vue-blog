@@ -16,3 +16,12 @@ class SPostService(SPost):
 
 class SPostTest(SPost):
     id: int
+
+
+class SLike(BaseModel):
+    user_id: int
+    post_id: int
+
+
+class SLikeService(SLike):
+    id: int

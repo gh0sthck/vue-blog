@@ -1,11 +1,13 @@
 from fastapi.routing import APIRouter
 
-from posts.schemas import SPost, SPostService
+from .like_repository import LikeRepository
+from posts.schemas import SLike, SLikeService, SPost, SPostService
 from .post_repository import PostRepository, SortTypes
 
 
 posts_router = APIRouter(prefix="/posts", tags=["Posts"])
 posts_repository = PostRepository()
+likes_repository = LikeRepository()
 
 
 @posts_router.get("/all")
@@ -31,3 +33,13 @@ async def posts_update(id: int, schema: SPost) -> SPost | None:
 @posts_router.delete("/delete/{id}")
 async def posts_delete(id: int) -> SPostService | None:
     return await posts_repository.delete(id_=id, commit=True)
+
+
+@posts_router.post("/like/{post_id}")
+async def posts_like(post_id: int, schema: SLike) -> SLikeService | None:
+    return await likes_repository.post(schema=schema, commit=True)
+
+
+@posts_router.get("/likes/{post_id}")
+async def posts_like_get(post_id: int) -> list[int] | None:
+    return await likes_repository.get(id_=post_id)

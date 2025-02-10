@@ -1,7 +1,7 @@
 import datetime
 from typing import List
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import DateTime, ForeignKey, Integer, String, Table, Text, func
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Table, Text, func
 from comments.models import Comment, Review
 from users.models import User
 from database import Model
@@ -22,3 +22,12 @@ class Post(Model):
 
     users: Mapped[List["User"]] = relationship(back_populates="posts")
     reviews: Mapped[list["Review"]] = relationship(backref="posts", secondary=Comment)
+
+
+Like = Table(
+    "like",
+    Model.metadata,
+    Column("id", Integer(), primary_key=True, autoincrement=True),
+    Column("post_id", ForeignKey("post.id", ondelete="cascade")),
+    Column("user_id", ForeignKey("user.id", ondelete="cascade")),
+)

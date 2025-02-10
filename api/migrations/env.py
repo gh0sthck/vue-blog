@@ -10,7 +10,7 @@ from alembic import context
 from settings import config as app_cfg
 from database import Model
 from users.models import User
-from posts.models import Post
+from posts.models import Post, Like
 from comments.models import Comment, Review
 
 # this is the Alembic Config object, which provides
