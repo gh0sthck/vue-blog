@@ -63,10 +63,8 @@ async function set_likes(posts_list: IPost[]) {
     const pid = posts_list[i].id;
     const { data } = await axios.get("http://localhost:8000/posts/likes/" + String(pid));
     posts_list[i].likes = data;
-    console.log(data) 
     if (data.includes(TEST_UID)) {
       posts_list[i].is_liked = true;
-      console.log("tt", posts_list[i].is_liked)
     } else {
       posts_list[i].is_liked = false;
     }
