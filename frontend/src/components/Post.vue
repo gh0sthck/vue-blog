@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import axios from 'axios';
-import { reactive, ref } from 'vue'
+import { inject, reactive, ref } from 'vue'
 
 import Comment from './Comment.vue'
+import { useCookies } from 'vue3-cookies';
 
 const props_post = defineProps({
   id: Number,
@@ -24,6 +25,7 @@ interface IComment {
 let text = ref<string>("");
 let opened_comments = ref<Boolean>(false);
 let comments = reactive<{ list: IComment[] }>({ list: [] })
+const current_user = inject("current_user");
 
 function close_text() {
     text.value = "";
@@ -44,12 +46,13 @@ function set_full_text() {
 }
 
 const like = async () => {
+  const { cookies } = useCookies(); 
   try {
-    console.log("props likes", props_post.likes)
     const { data } = await axios.post("http://localhost:8000/posts/like", {
       user_id: 31,
-      post_id: props_post.id
-    })
+      post_id: props_post.id,
+      access_token: cookies.get("access_token")  
+    }, {withCredentials: true})
     console.log(data);
   } catch (exc) {
     console.error(exc)
@@ -57,12 +60,13 @@ const like = async () => {
 }
 
 const dislike = async () => {
+  const { cookies } = useCookies();
   try {
     const { data } = await axios.post("http://localhost:8000/posts/dislike", {
       user_id: 31,
-      post_id: props_post.id
-    })
-    console.log(data);
+      post_id: props_post.id,
+      access_token: cookies.get("access_token")
+    }, { withCredentials: true })
   } catch (exc) {
     console.error(exc);
   }
@@ -93,7 +97,6 @@ const set_comments_authors = async (list: IComment[]) => {
 const comment = async () => {
   opened_comments.value = !opened_comments.value
   if (opened_comments) {
-    console.log("opened")
     const { data } = await axios.get("http://localhost:8000/comments/reviews_all/" + String(props_post.id));
     comments.list = data;
     set_date(comments.list); 
@@ -128,8 +131,8 @@ const comment = async () => {
           </a>
         </p>
       </a>
-      <a href="" @click.prevent="like()" v-if="!props_post.is_liked">Like ({{ props_post.likes?.length }})</a>
-      <a href="" @click.prevent="dislike()" v-if="props_post.is_liked">Dislike ({{ props_post.likes?.length }})</a>
+      <a href="" @click.prevent="like()" v-if="!(props_post.is_liked) && current_user">Like</a> ({{ props_post.likes?.length }})
+      <a href="" @click.prevent="dislike()" v-if="props_post.is_liked && current_user">Dislike</a>  
       <a href="" @click.prevent="comment()">Comment</a>
 
       <Comment
