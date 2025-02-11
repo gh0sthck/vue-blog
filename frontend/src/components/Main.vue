@@ -85,6 +85,7 @@ onMounted(async () => {
 watch(sort_by, async () => {
   posts.list = await get_posts(sort_by.value)
   await set_authors(posts.list)
+  await set_likes(posts.list)
 })
 
 </script>

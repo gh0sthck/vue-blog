@@ -27,8 +27,6 @@ const get_current_user = async () => {
     },)
     return data;
   } catch (exc) {
-    console.log(exc);
-
   }
 }
 provide("current_user", current_user);

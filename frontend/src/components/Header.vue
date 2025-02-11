@@ -24,7 +24,9 @@ const header_prop = defineProps({
             <RouterLink to="/">Blogg</RouterLink>
           </li>
           <li v-if="header_prop.user" class="nav__list-item"><a href="#">Профиль</a></li>
-          <li v-if="!header_prop.user" class="nav__list-item"><a href="#">Регистрация</a></li>
+          <li v-if="!header_prop.user" class="nav__list-item">
+            <RouterLink to="/register">Регистрация</RouterLink>
+          </li>
           <li v-if="!header_prop.user" class="nav__list-item">
             <RouterLink to="/login">Вход</RouterLink> 
           </li>

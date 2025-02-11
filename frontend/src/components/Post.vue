@@ -53,7 +53,6 @@ const like = async () => {
       post_id: props_post.id,
       access_token: cookies.get("access_token")  
     }, {withCredentials: true})
-    console.log(data);
   } catch (exc) {
     console.error(exc)
   }
