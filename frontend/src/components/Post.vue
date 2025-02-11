@@ -16,7 +16,7 @@ const props_post = defineProps({
 
 interface IComment {
   id: Number,
-  author: Number,
+  author: String,
   create_date: String,
   text: String
 }
@@ -72,19 +72,32 @@ const set_date = (list: IComment[]) => {
   for (let i = 0; i < list.length; i++) {
     const date = new Date(list[i].create_date);
     list[i].create_date = String(
-      date.getFullYear() + "-" + date.getMonth() + "-" + date.getDate() + ", в " + date.getHours() + ":" + date.getMinutes() )
+      date.getFullYear() + "-" + date.getMonth() + "-" + date.getDate() + ", в " + date.getHours() + ":" + date.getMinutes()
+    )
   }
   return list;
 }
 
+const set_comments_authors = async (list: IComment[]) => {
+  for (let i = 0; i < list.length; i++) {
+    try {
+      const { data } = await axios.get("http://localhost:8000/users/" + String(list[i].author))
+      list[i].author = data.username
+    } catch (exc) {
+      console.error(exc)
+    }
+  }
+  return list 
+}
+
 const comment = async () => {
   opened_comments.value = !opened_comments.value
-  console.log(1234, opened_comments.value)
   if (opened_comments) {
+    console.log("opened")
     const { data } = await axios.get("http://localhost:8000/comments/reviews_all/" + String(props_post.id));
     comments.list = data;
-    comments.list = set_date(comments.list); 
-    console.log("comments", comments.list)
+    set_date(comments.list); 
+    set_comments_authors(comments.list);
   }
   return comments
 }
@@ -123,7 +136,7 @@ const comment = async () => {
         v-for="comment in comments.list"
         :style="{ display: opened_comments ? 'block' : 'none'}"
         :text="comment.text"
-        :author="props_post.author"
+        :author="comment.author"
         :create_date="comment.create_date"
       />
     </div>
