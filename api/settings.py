@@ -24,6 +24,12 @@ class DatabaseSettings(BaseSettings):
         return self.postgres_dsn.unicode_string()
 
 
+class AuthSettings(BaseSettings):
+    SECRET_KEY: str = "mysecret"
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MIN: int = 4
+
+
 class DatabaseTestingSettings(BaseSettings):
     pg_data: PostgresData = PostgresData()
 
@@ -43,6 +49,6 @@ class Settings(BaseSettings):
 
     db: DatabaseSettings = DatabaseSettings()
     db_tests: DatabaseTestingSettings = DatabaseTestingSettings()
-
+    auth: AuthSettings = AuthSettings()
 
 config = Settings()
