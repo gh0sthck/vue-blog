@@ -2,6 +2,8 @@ import pytest
 import httpx
 import pytest_asyncio
 
+from users.schemas import SJWTPayload
+from users.utils import encode_jwt
 from comments.schemas import SCommentView, SReview, SReviewView
 from main import app
 
@@ -18,8 +20,17 @@ async def get_client():
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("id_", [i for i in range(1, 10)])
-async def test_comments_endp_insert(id_, pre_db_comments, get_client):
+async def test_comments_endp_insert(id_, get_user_list, pre_db_comments, get_client):
     client: httpx.AsyncClient = get_client
+    client.cookies.set(
+        "access_token",
+        encode_jwt(
+            SJWTPayload(
+                username=get_user_list[id_ - 10]["username"],
+                email=get_user_list[id_ - 10]["email"],
+            )
+        ).decode(),
+    )
     payload = SReview(text=f"test-review-insert-{id_}", author=id_ + 10)
     resp = await client.post(f"{id_+10}", json=payload.model_dump())
     assert resp.status_code == 200

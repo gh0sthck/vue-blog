@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field
 class SPost(BaseModel):
     title: str = Field(max_length=127)
     text: str
-    author: int
+    author: int | None = None
 
 
 class SPostService(SPost):

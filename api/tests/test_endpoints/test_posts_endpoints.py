@@ -2,6 +2,8 @@ import pytest
 import httpx
 import pytest_asyncio
 
+from users.schemas import SJWTPayload
+from users.utils import encode_jwt
 from posts.schemas import SLike, SLikeService, SPost, SPostService
 from main import app
 
@@ -11,9 +13,16 @@ URL = "http://localhost:8000/posts"
 @pytest_asyncio.fixture
 async def get_client():
     async with httpx.AsyncClient(
-        transport=httpx.ASGITransport(app=app), base_url=URL
+        transport=httpx.ASGITransport(app=app),
+        base_url=URL,
+        cookies={
+            "access_token": encode_jwt(
+                SJWTPayload(username="test_user-10", email="testmailuser-10@mail.com")
+            ).decode()
+        },
     ) as cli:
         yield cli
+
 
 RETURN_SCHEMA = SPostService
 
@@ -23,7 +32,6 @@ async def test_posts_endp_all(pre_db_posts, get_client):
     client: httpx.AsyncClient = get_client
     resp = await client.get("/all")
     assert resp.status_code == 200
-    print(resp.json())
     assert isinstance(resp.json(), list)
     assert isinstance(RETURN_SCHEMA.model_validate(resp.json()[0]), RETURN_SCHEMA)
 
@@ -57,8 +65,17 @@ async def test_posts_endp_insert(id_, pre_db_posts, get_client):
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("id_", [i for i in range(10, 20)])
-async def test_posts_endp_update(id_, pre_db_posts, get_client):
+async def test_posts_endp_update(id_, get_user_list, pre_db_posts, get_client):
     client: httpx.AsyncClient = get_client
+    client.cookies.set(
+        "access_token",
+        encode_jwt(
+            SJWTPayload(
+                username=get_user_list[id_ - 10]["username"],
+                email=get_user_list[id_ - 10]["email"],
+            )
+        ).decode(),
+    )
     new_model = SPost(
         title=f"post_test-update{id_}",
         text="text-updatedmodel",
@@ -74,8 +91,17 @@ async def test_posts_endp_update(id_, pre_db_posts, get_client):
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("id_", [i for i in range(10, 20)])
-async def test_posts_endp_delete(id_, pre_db_posts, get_client):
+async def test_posts_endp_delete(id_, get_user_list, pre_db_posts, get_client):
     client: httpx.AsyncClient = get_client
+    client.cookies.set(
+        "access_token",
+        encode_jwt(
+            SJWTPayload(
+                username=get_user_list[id_ - 10]["username"],
+                email=get_user_list[id_ - 10]["email"],
+            )
+        ).decode(),
+    )
     resp = await client.delete(url=f"/delete/{id_}")
     all_posts = await client.get(url="/all")
     assert resp.status_code == 200
@@ -88,10 +114,7 @@ async def test_posts_endp_delete(id_, pre_db_posts, get_client):
 @pytest.mark.parametrize("id_", [i for i in range(1, 10)])
 async def test_posts_endp_like(id_, pre_db_posts, get_client):
     client: httpx.AsyncClient = get_client
-    payload = SLike(
-        user_id=id_+10,
-        post_id=id_+10
-    ).model_dump()
+    payload = SLike(user_id=id_ + 10, post_id=id_ + 10).model_dump()
     resp = await client.post(url=f"/like", json=payload)
     assert resp.status_code == 200
     assert isinstance(SLikeService.model_validate(resp.json()), SLikeService)
@@ -104,4 +127,4 @@ async def test_posts_endp_like_get(post_id, pre_db_likes, get_client):
     resp = await client.get(f"/likes/{post_id}")
     assert resp.status_code == 200
     assert isinstance(resp.json(), list)
-    assert post_id in resp.json()  # In that case, post_id = user_id (fixtures.py) 
+    assert post_id in resp.json()  # In that case, post_id = user_id (fixtures.py)

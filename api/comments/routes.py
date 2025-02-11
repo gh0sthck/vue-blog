@@ -1,4 +1,8 @@
+from fastapi import Depends
 from fastapi.routing import APIRouter
+
+from users.routes import get_current_user
+from users.schemas import SUserService
 
 from .comments_repository import CommentsRepository
 
@@ -11,7 +15,8 @@ comments_repo = CommentsRepository(model=Comment, schema=SCommentView)
 
 
 @comments_router.post("/{id}")
-async def comments_insert(id: int, review: SReview) -> SCommentView:
+async def comments_insert(id: int, review: SReview, current_user: SUserService = Depends(get_current_user)) -> SCommentView:
+    review.author = current_user.id 
     r = await review_repo.post(schema=review, commit=True)
     return await comments_repo.post(
         schema=SComment(post_id=id, review_id=r.id), commit=True
