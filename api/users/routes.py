@@ -1,14 +1,11 @@
-from urllib import response
 from fastapi import Depends, Form, HTTPException, Request, Response
 from fastapi.routing import APIRouter
 
 from users.users_repository import UsersRepository
 from users.utils import decode_jwt, encode_jwt, hash_password, validate_password
 from users.schemas import SJWTPayload, SJWTToken, SUser, SUserService
-from repository import Repository
 
 users_router = APIRouter(prefix="/users", tags=["Users"])
-# users_repo = Repository(model=User, schema=SUserService)
 users_repo = UsersRepository()
 
 
@@ -40,12 +37,11 @@ async def users_all() -> None | list[SUserService]:
 @users_router.post("/register")
 async def users_register(schema: SUser) -> SUserService:
     schema.password = (hash_password(schema.password.encode())).decode()
-    print(schema)
     return await users_repo.post(schema, commit=True)
 
 
 @users_router.post("/login")
-async def users_login(response: Response, schema: SUser = Depends(validate_auth_user)) -> None:
+async def users_login(response: Response, schema: SUser = Depends(validate_auth_user)) -> SJWTToken:
     payload = SJWTPayload(
         username=schema.username,
         email=schema.email
@@ -65,11 +61,11 @@ async def users_me(user: SUserService = Depends(get_current_user)) -> SUserServi
 
 
 @users_router.post("/logout")
-async def users_logout(request: Request, response: Response) -> dict[str, int]:
+async def users_logout(request: Request, response: Response) -> dict[int, str]:
     token = request.cookies.get("access_token")
     if token:
         response.delete_cookie("access_token")
-        return {"status": 200}
+        return {200: "Success"}
     raise HTTPException(status_code=401, detail="Unauthorized")
 
 

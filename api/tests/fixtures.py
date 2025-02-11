@@ -18,7 +18,7 @@ def get_user_list() -> list[dict]:
             id=cnt,
             username=f"test_user-{cnt}",
             birthday=datetime.date.today(),
-            password="testpassword",
+            password=(bcrypt.hashpw(f"testpassword-{cnt}".encode(), bcrypt.gensalt())).decode(),
             email=f"testmailuser-{cnt}@mail.com",
             bio="testbio",
         ).model_dump()
