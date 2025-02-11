@@ -22,7 +22,7 @@ def decode_jwt(
     jwt_token: bytes,
     secret: str = config.auth.SECRET_KEY,
     algorithm: str = config.auth.ALGORITHM,
-):
+) -> dict:
     try:
         decoded_jwt = jwt.decode(jwt_token, key=secret, algorithms=[algorithm])
     except jwt.PyJWTError:
@@ -30,8 +30,10 @@ def decode_jwt(
     return decoded_jwt
 
 
-def hash_password(password: bytes) -> bytes:
-    return bcrypt.hashpw(password=password, salt=bcrypt.gensalt())
+def hash_password(password: bytes, salt: bytes | None = None) -> bytes:
+    if not salt:
+        salt = bcrypt.gensalt()
+    return bcrypt.hashpw(password=password, salt=salt)
 
 
 def validate_password(password: str, password_hash: bytes):

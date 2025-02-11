@@ -23,7 +23,6 @@ async def validate_auth_user(username: str = Form(), password: str = Form()):
 
 async def get_token(request: Request):
     token = request.cookies.get("access_token")
-    print(token)
     if token:
         return decode_jwt(token.encode())
     raise HTTPException(status_code=401, detail="Unauthorized")
