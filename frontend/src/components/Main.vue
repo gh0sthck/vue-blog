@@ -4,7 +4,7 @@ import axios from 'axios'
 
 import Post from './Post.vue'
 import type { IPost, IUser } from '@/interfaces';
-import { set_authors, set_likes } from '@/utils';
+import { set_authors, set_likes, get_comments } from '@/utils';
 
 
 let posts = reactive<{ list: IPost[] }>({
@@ -38,18 +38,18 @@ async function get_posts(sort: string | null) {
   }
 }
 
-
 onMounted(async () => {
   posts.list = await get_posts(null);
   posts.list = await set_authors(posts.list);
   posts.list = await set_likes(posts.list, current_user);
+  posts.list = await get_comments(posts.list); 
 })
 
 
 watch(sort_by, async () => {
   posts.list = await get_posts(sort_by.value)
   await set_authors(posts.list)
-  await set_likes(posts.list)
+  await set_likes(posts.list, current_user)
 })
 
 </script>
@@ -58,6 +58,7 @@ watch(sort_by, async () => {
   <main class="main">
     <div class="container">
       <div class="posts">
+        <label for="sort">Сортировать по</label>
         <select @change="on_sort_change" name="sort" id="sort">
           <option value="all">Все</option>
           <option value="newest">Новые</option>
@@ -66,7 +67,7 @@ watch(sort_by, async () => {
           <option value="title">По название</option>
         </select>
         <Post v-for="post in posts.list" v-key="post.id" :id="post.id" :title="post.title" :author="post.author"
-          :created_date="post.created_date" :text="post.text" :likes="post.likes" :is_liked="post.is_liked" />
+          :created_date="post.created_date" :text="post.text" :likes="post.likes" :is_liked="post.is_liked" :comments_count="post.comments_count" />
       </div>
     </div>
   </main>

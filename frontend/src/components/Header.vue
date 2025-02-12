@@ -1,15 +1,6 @@
 <script setup lang="ts">
-// import type { TUser } from '@/types';
 import type { PropType } from 'vue'
 import type { IUser } from '@/interfaces'
-// interface IUser {
-//   id: Number,
-//   username: String,
-//   email: String,
-//   bio: String,
-//   birthday: String 
-// }
-
 
 const header_prop = defineProps({
   user: Object as PropType<IUser | undefined | null>
@@ -35,7 +26,7 @@ const header_prop = defineProps({
             <RouterLink to="/login">Вход</RouterLink> 
           </li>
           <li v-if="header_prop.user" class="nav__list-item">
-            <RouterLink to="/logout">Выход</RouterLink>
+            <RouterLink class="btn btn-danger" to="/logout">Выход</RouterLink>
           </li>
         </ul>
       </nav>

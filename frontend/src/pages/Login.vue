@@ -26,7 +26,8 @@ const login = async () => {
 
 <template>
   <div class="container">
-    <form method="post" @submit.prevent="login">
+    <h1>Вход</h1>
+    <form style="display: flex; flex-direction: column;" method="post" @submit.prevent="login">
       <input type="text" placeholder="Имя пользователя" v-model="username" name="username">
       <input type="password" placeholder="Пароль" v-model="password" name="password" id="">
       <input type="submit" value="Войти">

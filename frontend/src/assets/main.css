@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
 * {
   padding: 0;
   margin: 0;
@@ -9,6 +11,8 @@
   border: none;
   text-decoration: none;
   box-sizing: border-box;
+  font-family: 'PT Sans', serif;
+  font-size: 18px;
 }
 
 html {
@@ -31,13 +35,30 @@ a {
   -ms-select: text;
 }
 
+p {
+    padding: 0;
+    margin: 0;
+}
+
 .header {
-  background-color: #affdbc;
+  background-color: rgba(90, 112, 211, 0.5);
   margin-bottom: 20px;
+  height: 90px;
+}
+
+.header a {
+  font-size: 20px;
+  font-weight: 700;
 }
 
 .footer {
   margin-top: auto;
+  background-color: rgba(90, 112, 211, 0.5);
+}
+
+.footer p {
+  text-align: center;
+  padding-top: 20px;
 }
 
 .navigation__list {
@@ -46,6 +67,7 @@ a {
   justify-content: space-around;
   align-items: center;
   padding: 15px 0;
+  height: 90px;
 }
 
 .posts {
@@ -55,9 +77,19 @@ a {
 .post {
   display: block;
   padding: 30px;
-  border-radius: 40px;
+  border-radius: 20px;
   margin-bottom: 30px;
-  border: 1px solid rgb(139, 184, 116, 0.5);
+  background-color: rgba(90, 112, 211, 0.1);
+}
+
+.posts select {
+  padding: 10px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+label {
+  margin-right: 10px;
 }
 
 .post_content {
@@ -65,10 +97,35 @@ a {
 }
 
 .post_text {
-  font-size: 18px;
+  font-size: 20px;
 }
 
 .post_text a {
-    font-weight: 700;
-    color: #8bb874;
+  font-weight: 700;
+  color: #5a70d3;
+}
+
+.post__interact {
+  display: flex;
+  align-items: center;
+}
+
+input, textarea {
+  background-color: rgba(90, 112, 211, 0.2);
+  border-radius: 10px;
+  margin: 10px 5px;
+  padding: 2px 15px;
+}
+
+
+.register form {
+    display: flex;
+    flex-direction: column;
+}
+
+.comment {
+  background-color: rgba(164, 178, 236, 0.2);
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 10px;
 }

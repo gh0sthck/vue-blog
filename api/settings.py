@@ -44,7 +44,7 @@ class DatabaseTestingSettings(BaseSettings):
 
 class Settings(BaseSettings):
     debug: bool = True
-    app_name: str = "Blog"
+    app_name: str = "Blogg"
     docs_url: str = "/docs/"
 
     db: DatabaseSettings = DatabaseSettings()

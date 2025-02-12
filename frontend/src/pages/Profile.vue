@@ -5,8 +5,7 @@ import axios from 'axios';
 
 import Post from '../components/Post.vue';
 import { type IPost, type IUser } from '@/interfaces';
-import { set_authors } from '@/utils';
-import { set_likes } from '@/utils';
+import { set_authors, set_likes, get_comments } from '@/utils';
 
 let user_posts = reactive<{ ls: IPost[] }>({
   ls: []
@@ -61,6 +60,7 @@ onMounted(async () => {
   user_posts.ls = await get_posts();
   user_posts.ls = await set_authors(user_posts.ls);
   user_posts.ls = await set_likes(user_posts.ls, current_user);
+  user_posts.ls = await get_comments(user_posts.ls);
 })
 </script>
 
@@ -71,15 +71,15 @@ onMounted(async () => {
     </h1>
     <div v-if="current_user" class="profile__posts">
       <h3>Создать запись</h3>
-      <form @submit.prevent="set_post" class="profile__posts-form">
-        <input type="text" v-model="post_title" name="title" />
-        <textarea name="text" v-model="post_text"></textarea>
+      <form style="display: flex; flex-direction: column;" @submit.prevent="set_post" class="profile__posts-form">
+        <input type="text" placeholder="Заголовок" v-model="post_title" name="title" />
+        <textarea name="text" placeholder="Текст" v-model="post_text"></textarea>
         <input type="submit" value="Отправить">
       </form>
       <div class="posts">
         <Post v-for="post in user_posts.ls" v-bind:key="post.id" :id="post.id" :title="post.title" :text="post.text"
           :created_date="post.created_date" :author="current_user?.username" :likes="post.likes"
-          :is_liked="post.is_liked" />
+          :is_liked="post.is_liked" :comments_count="post.comments_count" />
       </div>
     </div>
   </div>

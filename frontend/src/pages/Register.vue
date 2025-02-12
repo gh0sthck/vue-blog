@@ -30,6 +30,7 @@ const register = async () => {
 <template>
   <div class="container">
     <h2>Регистрация</h2>
+    <div class="register">
     <form method="post" @submit.prevent="register">
       <input type="text" placeholder="Имя пользователя" name="username" v-model="username" />
       <input type="password" placeholder="Пароль" name="password" v-model="password" />
@@ -38,12 +39,7 @@ const register = async () => {
       <input type="date" name="birthday" v-model="birthday" />
       <input type="submit" value="Зарегестрироваться"> 
     </form>
+
+    </div> 
   </div>
 </template>
-
-<style scoped>
-input, textarea {
-  border: 2px solid black;
-  border-radius: 30px;
-}
-</style>

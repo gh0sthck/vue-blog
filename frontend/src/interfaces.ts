@@ -14,4 +14,5 @@ export interface IPost {
   created_date: string,
   likes: number[],
   is_liked: boolean,
+  comments_count: number,
 };
