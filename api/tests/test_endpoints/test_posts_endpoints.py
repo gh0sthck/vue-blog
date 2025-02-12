@@ -128,3 +128,13 @@ async def test_posts_endp_like_get(post_id, pre_db_likes, get_client):
     assert resp.status_code == 200
     assert isinstance(resp.json(), list)
     assert post_id in resp.json()  # In that case, post_id = user_id (fixtures.py)
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("user_id", [i for i in range(10, 20)])
+async def test_posts_endp_by_user(user_id, pre_db_posts, get_client):
+    client: httpx.AsyncClient = get_client
+    resp = await client.get(f"by_user/{user_id}")
+    assert resp.status_code == 200
+    assert isinstance(resp.json(), list)
+    assert RETURN_SCHEMA.model_validate(resp.json()[0])
