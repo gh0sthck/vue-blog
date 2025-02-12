@@ -49,7 +49,7 @@ const like = async () => {
   const { cookies } = useCookies(); 
   try {
     const { data } = await axios.post("http://localhost:8000/posts/like", {
-      user_id: 31,
+      user_id: 0,
       post_id: props_post.id,
       access_token: cookies.get("access_token")  
     }, {withCredentials: true})
@@ -104,6 +104,21 @@ const comment = async () => {
   return comments
 }
 
+const comment_text = ref<string>("");
+
+const set_comment = async() => {
+  const { cookies } = useCookies();
+  try {
+    const { data } = await axios.post("http://localhost:8000/comments/" + String(props_post.id), {
+      text: comment_text.value,
+      author: 0, 
+      access_token: cookies.get("access_token"), 
+    }, {withCredentials: true});
+  } catch (exc) {
+    console.error(exc);
+  }
+}
+
 </script>
 
 <template>
@@ -134,6 +149,13 @@ const comment = async () => {
       <a href="" @click.prevent="dislike()" v-if="props_post.is_liked && current_user">Dislike</a>  
       <a href="" @click.prevent="comment()">Comment</a>
 
+      <div :style="{ display: opened_comments && current_user ? 'block' : 'none' }" class="comment_form">
+        <form method="post" @submit.prevent="set_comment">
+          <input type="text" name="comment" v-model="comment_text">
+          <input type="submit" value="Отправить">
+        </form>
+      </div>
+
       <Comment
         v-for="comment in comments.list"
         :style="{ display: opened_comments ? 'block' : 'none'}"
@@ -141,6 +163,7 @@ const comment = async () => {
         :author="comment.author"
         :create_date="comment.create_date"
       />
+
     </div>
   </div>
 </template>
