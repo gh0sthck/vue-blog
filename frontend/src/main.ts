@@ -10,6 +10,7 @@ import Main from './components/Main.vue'
 import Login from './pages/Login.vue'
 import Logout from './pages/Logout.vue'
 import Register from './pages/Register.vue'
+import Profile from './pages/Profile.vue'
 
 const app = createApp(App)
 
@@ -18,6 +19,7 @@ const routes = [
   { path: "/login", name: "login", component: Login },
   { path: "/logout", name: "logout", component: Logout },
   { path: "/register", name: "register", component: Register },
+  { path: "/profile", name: "profile", component: Profile }
 ]
 
 export const router = createRouter({

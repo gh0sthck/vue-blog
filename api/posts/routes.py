@@ -24,6 +24,11 @@ async def posts_get_by_id(id: int) -> SPostService | None:
     return await posts_repository.get(id_=id)
 
 
+@posts_router.get("/by_user/{user_id}")
+async def posts_get_by_userid(user_id: int) -> list[SPostService]:
+    return await posts_repository.get_by_userid(user_id=user_id)
+
+
 @posts_router.post("/add")
 async def posts_add(
     schema: SPost, current_user: SUserService = Depends(get_current_user)

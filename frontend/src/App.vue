@@ -4,19 +4,13 @@ import axios from 'axios'
 import { useCookies } from 'vue3-cookies';
 
 import Header from './components/Header.vue'
+import type { IUser } from './interfaces';
 
-interface IUser {
-  id: Number,
-  username: String,
-  email: String,
-  bio: String,
-  birthday: String
-}
-
-const current_user = ref<IUser | null>(null);
+let current_user = ref<IUser | undefined | null>(null);
 
 const get_current_user = async () => {
   const { cookies } = useCookies();
+  let user: IUser; 
   try {
     const { data } = await axios.get("http://localhost:8000/users/me", {
       headers: {
@@ -25,11 +19,14 @@ const get_current_user = async () => {
       },
       withCredentials: true
     },)
-    return data;
+    user = data;
+    return user;
   } catch (exc) {
   }
 }
+
 provide("current_user", current_user);
+
 onMounted(async () => {
   current_user.value = await get_current_user();
 })

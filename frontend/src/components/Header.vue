@@ -1,16 +1,18 @@
 <script setup lang="ts">
+// import type { TUser } from '@/types';
 import type { PropType } from 'vue'
-interface IUser {
-  id: Number,
-  username: String,
-  email: String,
-  bio: String,
-  birthday: String 
-}
+import type { IUser } from '@/interfaces'
+// interface IUser {
+//   id: Number,
+//   username: String,
+//   email: String,
+//   bio: String,
+//   birthday: String 
+// }
 
 
 const header_prop = defineProps({
-  user: Object as PropType<IUser> | null
+  user: Object as PropType<IUser | undefined | null>
 })
 
 </script>
@@ -23,7 +25,9 @@ const header_prop = defineProps({
           <li class="nav__list-item">
             <RouterLink to="/">Blogg</RouterLink>
           </li>
-          <li v-if="header_prop.user" class="nav__list-item"><a href="#">Профиль</a></li>
+          <li v-if="header_prop.user" class="nav__list-item">
+            <RouterLink to="/profile">{{ header_prop.user.username }}</RouterLink>
+          </li>
           <li v-if="!header_prop.user" class="nav__list-item">
             <RouterLink to="/register">Регистрация</RouterLink>
           </li>

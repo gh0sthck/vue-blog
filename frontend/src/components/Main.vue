@@ -3,23 +3,15 @@ import { reactive, ref, watch, onMounted, inject } from 'vue'
 import axios from 'axios'
 
 import Post from './Post.vue'
+import type { IPost, IUser } from '@/interfaces';
+import { set_authors, set_likes } from '@/utils';
 
-interface IPost {
-  id: number,
-  title: string,
-  author: string,
-  text: string,
-  created_date: string,
-  likes: number[],
-  is_liked: boolean,
-};
 
 let posts = reactive<{ list: IPost[] }>({
   list: []
 });
-
-const sort_by = ref<string>("");
-const current_user = inject("current_user")
+let sort_by = ref<string>("");
+let current_user: IUser | null | undefined = inject("current_user")
 
 function on_sort_change(event: any) {
   sort_by.value = event.target.value
@@ -46,39 +38,11 @@ async function get_posts(sort: string | null) {
   }
 }
 
-async function set_authors(posts_list: IPost[]) {
-  for (let i = 0; i < posts_list.length; i++) {
-    const auth_id = posts_list[i].author;
-    const { data } = await axios.get("http://localhost:8000/users/" + String(auth_id));
-    posts_list[i].author = data.username;
-    const date = new Date(posts.list[i].created_date)
-    posts_list[i].created_date = String(date.getFullYear() + "-" + date.getMonth() + "-" + date.getDate());
-  }
-  return posts_list
-}
-
-async function set_likes(posts_list: IPost[]) {
-  for (let i = 0; i < posts_list.length; i++) {
-    const pid = posts_list[i].id;
-    const { data } = await axios.get("http://localhost:8000/posts/likes/" + String(pid));
-    posts_list[i].likes = data;
-    if (current_user.value) {
-      if (data.includes(current_user.value.id)) {
-        posts_list[i].is_liked = true;
-      } else {
-        posts_list[i].is_liked = false;
-      }
-    } else {
-      posts_list[i].is_liked = false;
-    }
-  }
-  return posts_list;
-}
 
 onMounted(async () => {
   posts.list = await get_posts(null);
   posts.list = await set_authors(posts.list);
-  posts.list = await set_likes(posts.list);
+  posts.list = await set_likes(posts.list, current_user);
 })
 
 

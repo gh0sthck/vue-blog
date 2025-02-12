@@ -1,6 +1,7 @@
 import datetime
 import enum
 from sqlalchemy import Date, Insert, Select, cast, func
+from sqlalchemy.ext.asyncio.session import AsyncSession
 
 from .models import Post
 from .schemas import SPost, SPostService
@@ -52,6 +53,16 @@ class PostRepository(Repository):
         if pre_result:
             self.logger.debug(f"Get Pre result = {pre_result}")
             return [self.schema.model_validate(obj=r.__dict__) for r in pre_result]
+        return []
+
+    @Repository._session
+    async def get_by_userid(self, user_id: int, _session: AsyncSession=...) -> list[SPostService]:
+        q = Select(self.model).where(self.model.author==user_id)
+        r = await _session.execute(q)
+        pre_result = r.scalars().all() 
+        if pre_result:
+            self.logger.debug(f"Get pre result (posts by uid) = {pre_result}")
+            return [self.schema.model_validate(r, from_attributes=True) for r in pre_result]
         return []
 
     @Repository._session

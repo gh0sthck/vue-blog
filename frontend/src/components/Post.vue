@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import axios from 'axios';
-import { inject, reactive, ref } from 'vue'
+import { inject, provide, reactive, ref } from 'vue'
 
 import Comment from './Comment.vue'
 import { useCookies } from 'vue3-cookies';
+import type { IUser } from '@/interfaces';
 
 const props_post = defineProps({
   id: Number,
@@ -25,7 +26,7 @@ interface IComment {
 let text = ref<string>("");
 let opened_comments = ref<Boolean>(false);
 let comments = reactive<{ list: IComment[] }>({ list: [] })
-const current_user = inject("current_user");
+let current_user: IUser | undefined | null = inject("current_user");
 
 function close_text() {
     text.value = "";
@@ -62,7 +63,7 @@ const dislike = async () => {
   const { cookies } = useCookies();
   try {
     const { data } = await axios.post("http://localhost:8000/posts/dislike", {
-      user_id: 31,
+      user_id: 0,
       post_id: props_post.id,
       access_token: cookies.get("access_token")
     }, { withCredentials: true })
@@ -118,6 +119,7 @@ const set_comment = async() => {
     console.error(exc);
   }
 }
+
 
 </script>
 
