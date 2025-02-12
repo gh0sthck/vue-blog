@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { inject, onMounted, reactive } from 'vue';
+import { inject, onMounted, reactive, ref } from 'vue';
 import { useCookies } from 'vue3-cookies';
 import axios from 'axios';
 
@@ -12,6 +12,8 @@ let user_posts = reactive<{ ls: IPost[] }>({
   ls: []
 })
 let current_user: IUser | null | undefined = inject<IUser | null | undefined>("current_user");
+let post_title = ref<string>("");
+let post_text = ref<string>("");
 
 const get_current_user = async () => {
   const { cookies } = useCookies();
@@ -39,9 +41,18 @@ const get_posts = async () => {
   }
 }
 
-
 const set_post = async () => {
-  console.log("set")
+  const { cookies } = useCookies();
+  try {
+    const { data } = await axios.post("http://localhost:8000/posts/add", {
+      title: post_title.value,
+      text: post_text.value,
+      author: 0,
+      access_token: cookies.get("access_token"),
+    }, { withCredentials: true })
+  } catch (exc) {
+    console.error(exc);
+  }
 }
 
 
@@ -50,8 +61,6 @@ onMounted(async () => {
   user_posts.ls = await get_posts();
   user_posts.ls = await set_authors(user_posts.ls);
   user_posts.ls = await set_likes(user_posts.ls, current_user);
-  console.log("CURRENT USER MOUNTED", current_user.value)
-  console.log("users posts mount", user_posts.ls)
 })
 </script>
 
@@ -63,8 +72,8 @@ onMounted(async () => {
     <div v-if="current_user" class="profile__posts">
       <h3>Создать запись</h3>
       <form @submit.prevent="set_post" class="profile__posts-form">
-        <input type="text" name="title" />
-        <textarea name="text"></textarea>
+        <input type="text" v-model="post_title" name="title" />
+        <textarea name="text" v-model="post_text"></textarea>
         <input type="submit" value="Отправить">
       </form>
       <div class="posts">
